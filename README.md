@@ -1,17 +1,10 @@
 # Kimi CLI
 
-[![Commit Activity](https://img.shields.io/github/commit-activity/w/MoonshotAI/kimi-cli)](https://github.com/MoonshotAI/kimi-cli/graphs/commit-activity)
-[![Checks](https://img.shields.io/github/check-runs/MoonshotAI/kimi-cli/main)](https://github.com/MoonshotAI/kimi-cli/actions)
-[![Version](https://img.shields.io/pypi/v/kimi-cli)](https://pypi.org/project/kimi-cli/)
-[![Downloads](https://img.shields.io/pypi/dw/kimi-cli)](https://pypistats.org/packages/kimi-cli)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/MoonshotAI/kimi-cli)
 
 [中文](https://www.kimi.com/coding/docs/kimi-cli.html)
 
 Kimi CLI is a new CLI agent that can help you with your software development tasks and terminal operations.
-
-> [!IMPORTANT]
-> Kimi CLI is currently in technical preview.
 
 ## Key features
 
@@ -173,10 +166,10 @@ kimi --mcp-config-file /path/to/mcp.json
 To develop Kimi CLI, run:
 
 ```sh
-git clone https://github.com/MoonshotAI/kimi-cli.git
-cd kimi-cli
+git clone git@github.com:yanfeng98/fork-kimi-cli.git
+cd fork-kimi-cli
 
-make prepare  # prepare the development environment
+make prepare
 ```
 
 Then you can start working on Kimi CLI.
@@ -197,6 +190,21 @@ make build-bin  # build standalone binary
 make help  # show all make targets
 ```
 
-## Contributing
+## Prek hooks
 
-We welcome contributions to Kimi CLI! Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+We use [prek](https://github.com/j178/prek) to run formatting and checks via git hooks.
+
+Recommended setup:
+1. Run `make prepare` to sync dependencies and install the prek hooks.
+2. Optionally run on all files before sending a PR: `prek run --all-files`.
+
+Manual setup (if you do not want to use `make prepare`):
+1. Install prek: `uv tool install prek`.
+2. Install the hooks in this repo: `prek install`.
+
+After installation, the hooks run on every commit. The repo uses prek workspace mode, so only the
+projects with changed files run their hooks. You can skip them for an intermediate commit with
+`git commit --no-verify`, or run them manually with `prek run --all-files`.
+
+The hooks execute the relevant `make format-*` and `make check-*` targets, so ensure dependencies
+are installed (`make prepare` or `uv sync`).

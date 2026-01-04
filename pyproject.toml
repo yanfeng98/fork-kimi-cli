@@ -26,7 +26,7 @@ dependencies = [
     "pydantic==2.12.5",
     "httpx[socks]==0.28.1",
     "pykaos==0.5.3",
-    "batrachian-toad==0.5.14; python_version >= \"3.14\"",
+    # "batrachian-toad==0.5.14; python_version >= \"3.14\"",
     "tomlkit==0.13.3",
 ]
 
@@ -46,7 +46,7 @@ requires = ["uv_build>=0.8.5,<0.10.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = ["kimi_cli"]
+module-name = "kimi_cli"
 source-exclude = ["examples/**/*", "tests/**/*", "src/kimi_cli/deps/**/*"]
 
 [tool.uv.workspace]
@@ -74,7 +74,7 @@ select = [
 ]
 
 [tool.ty.environment]
-python-version = "3.14"
+python-version = "3.12"
 
 [tool.ty.src]
 include = ["src/**/*.py", "tests/**/*.py", "tests_ai/scripts/**/*.py"]
