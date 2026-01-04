@@ -15,18 +15,11 @@ from kimi_cli.utils.logging import logger
 
 
 class LLMProvider(BaseModel):
-    """LLM provider configuration."""
-
     type: ProviderType
-    """Provider type"""
     base_url: str
-    """API base URL"""
     api_key: SecretStr
-    """API key"""
     env: dict[str, str] | None = None
-    """Environment variables to set before creating the provider instance"""
     custom_headers: dict[str, str] | None = None
-    """Custom headers to include in API requests"""
 
     @field_serializer("api_key", when_used="json")
     def dump_secret(self, v: SecretStr):
@@ -202,18 +195,6 @@ def load_config(config_file: Path | None = None) -> Config:
 
 
 def load_config_from_string(config_string: str) -> Config:
-    """
-    Load configuration from a TOML or JSON string.
-
-    Args:
-        config_string (str): TOML or JSON configuration text.
-
-    Returns:
-        Validated Config object.
-
-    Raises:
-        ConfigError: If the configuration text is invalid.
-    """
     if not config_string.strip():
         raise ConfigError("Configuration text cannot be empty")
 

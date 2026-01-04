@@ -17,7 +17,7 @@ type ProviderType = Literal[
     "openai_legacy",
     "openai_responses",
     "anthropic",
-    "google_genai",  # for backward-compatibility, equals to `gemini`
+    "google_genai",
     "gemini",
     "vertexai",
     "_echo",

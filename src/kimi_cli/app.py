@@ -33,13 +33,12 @@ if TYPE_CHECKING:
 
 
 def enable_logging(debug: bool = False) -> None:
-    logger.remove()  # Remove default stderr handler
+    logger.remove()
     logger.enable("kimi_cli")
     if debug:
         logger.enable("kosong")
     logger.add(
         get_share_dir() / "logs" / "kimi.log",
-        # FIXME: configure level for different modules
         level="TRACE" if debug else "INFO",
         rotation="06:00",
         retention="10 days",

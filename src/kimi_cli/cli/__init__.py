@@ -259,9 +259,9 @@ def kimi(
 ):
     """Kimi, your next CLI agent."""
     if ctx.invoked_subcommand is not None:
-        return  # skip rest if a subcommand is invoked
+        return
 
-    del version  # handled in the callback
+    del version
 
     from kaos.path import KaosPath
 
