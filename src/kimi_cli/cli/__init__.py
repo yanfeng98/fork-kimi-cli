@@ -419,7 +419,7 @@ def kimi(
 
         instance = await KimiCLI.create(
             session,
-            yolo=yolo or (ui == "print"),  # print mode implies yolo
+            yolo=yolo or (ui == "print"),
             mcp_configs=mcp_configs,
             config=config,
             model_name=model_name,

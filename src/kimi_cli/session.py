@@ -20,23 +20,13 @@ from kimi_cli.wire.serde import WireMessageRecord
 
 @dataclass(slots=True, kw_only=True)
 class Session:
-    """A session of a work directory."""
-
-    # static metadata
     id: str
-    """The session ID."""
     work_dir: KaosPath
-    """The absolute path of the work directory."""
     work_dir_meta: WorkDirMeta
-    """The metadata of the work directory."""
     context_file: Path
-    """The absolute path to the file storing the message history."""
 
-    # refreshable metadata
     title: str
-    """The title of the session."""
     updated_at: float
-    """The timestamp of the last update to the session."""
 
     @property
     def dir(self) -> Path:
@@ -47,7 +37,6 @@ class Session:
 
     @property
     def wire_file(self) -> Path:
-        """The file backend for persisting Wire messages."""
         return self.dir / "wire.jsonl"
 
     def is_empty(self) -> bool:
@@ -102,7 +91,6 @@ class Session:
         session_id: str | None = None,
         _context_file: Path | None = None,
     ) -> Session:
-        """Create a new session for a work directory."""
         work_dir = work_dir.canonical()
         logger.debug("Creating new session for work directory: {work_dir}", work_dir=work_dir)
 
@@ -128,7 +116,6 @@ class Session:
             context_file = _context_file
 
         if context_file.exists():
-            # truncate if exists
             logger.warning(
                 "Context file already exists, truncating: {context_file}", context_file=context_file
             )

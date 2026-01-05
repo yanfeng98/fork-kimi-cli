@@ -58,30 +58,6 @@ class KimiCLI:
         agent_file: Path | None = None,
         skills_dir: Path | None = None,
     ) -> KimiCLI:
-        """
-        Create a KimiCLI instance.
-
-        Args:
-            session (Session): A session created by `Session.create` or `Session.continue_`.
-            yolo (bool, optional): Approve all actions without confirmation. Defaults to False.
-            mcp_configs (list[MCPConfig | dict[str, Any]] | None, optional): MCP configs to load
-                MCP tools from. Defaults to None.
-            config (Config | Path | None, optional): Configuration to use, or path to config file.
-                Defaults to None.
-            model_name (str | None, optional): Name of the model to use. Defaults to None.
-            thinking (bool, optional): Whether to enable thinking mode. Defaults to False.
-            agent_file (Path | None, optional): Path to the agent file. Defaults to None.
-            skills_dir (Path | None, optional): Path to the skills directory. Defaults to None.
-
-        Raises:
-            FileNotFoundError: When the agent file is not found.
-            ConfigError(KimiCLIException, ValueError): When the configuration is invalid.
-            AgentSpecError(KimiCLIException, ValueError): When the agent specification is invalid.
-            InvalidToolError(KimiCLIException, ValueError): When any tool cannot be loaded.
-            MCPConfigError(KimiCLIException, ValueError): When any MCP configuration is invalid.
-            MCPRuntimeError(KimiCLIException, RuntimeError): When any MCP server cannot be
-                connected.
-        """
         config = config if isinstance(config, Config) else load_config(config)
         logger.info("Loaded config: {config}", config=config)
 
