@@ -15,8 +15,6 @@ from .mcp import cli as mcp_cli
 
 
 class Reload(Exception):
-    """Reload configuration."""
-
     def __init__(self, session_id: str | None = None):
         super().__init__("reload")
         self.session_id = session_id
@@ -375,9 +373,8 @@ def kimi(
     file_configs = list(mcp_config_file or [])
     raw_mcp_config = list(mcp_config or [])
 
-    # Use default MCP config file if no MCP config is provided
     if not file_configs:
-        default_mcp_file = get_global_mcp_config_file()
+        default_mcp_file: Path = get_global_mcp_config_file()
         if default_mcp_file.exists():
             file_configs.append(default_mcp_file)
 

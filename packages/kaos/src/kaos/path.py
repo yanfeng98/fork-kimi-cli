@@ -9,19 +9,11 @@ import kaos
 
 
 class KaosPath:
-    """
-    A path abstraction for KAOS filesystem.
-    """
-
     def __init__(self, *args: str) -> None:
         self._path: PurePath = kaos.pathclass()(*args)
 
     @classmethod
     def unsafe_from_local_path(cls, path: Path) -> KaosPath:
-        """
-        Create a `KaosPath` from a local `Path`.
-        Only use this if you are sure that `LocalKaos` is being used.
-        """
         return cls(str(path))
 
     def unsafe_to_local_path(self) -> Path:
@@ -65,7 +57,6 @@ class KaosPath:
         return KaosPath(str(self._path.parent))
 
     def is_absolute(self) -> bool:
-        """Return True if the path is absolute."""
         return self._path.is_absolute()
 
     def joinpath(self, *other: str) -> KaosPath:
@@ -80,16 +71,8 @@ class KaosPath:
         return ret
 
     def canonical(self) -> KaosPath:
-        """
-        Make the path absolute, resolving all `.` and `..` in the path.
-        Unlike `pathlib.Path.resolve`, this method does not resolve symlinks.
-        """
-        abs_path = self if self.is_absolute() else kaos.getcwd().joinpath(str(self._path))
-        # Normalize the path (handle . and ..) but preserve the format
-        normalized = kaos.normpath(abs_path)
-        # `normpath` might strip trailing slash, but we want to preserve it for directories
-        # However, since we don't access the filesystem, we can't know if it's a directory
-        # So we follow the pathlib behavior which doesn't preserve trailing slashes
+        abs_path: KaosPath = self if self.is_absolute() else kaos.getcwd().joinpath(str(self._path))
+        normalized: KaosPath = kaos.normpath(abs_path)
         return normalized
 
     def relative_to(self, other: KaosPath) -> KaosPath:
@@ -104,7 +87,6 @@ class KaosPath:
 
     @classmethod
     def cwd(cls) -> KaosPath:
-        """Return the current working directory as a KaosPath."""
         return kaos.getcwd()
 
     async def stat(self, follow_symlinks: bool = True) -> kaos.StatResult:

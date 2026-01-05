@@ -2,17 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import os
+import posixpath as pathmodule
 from asyncio.subprocess import Process as AsyncioProcess
 from collections.abc import AsyncGenerator
 from pathlib import Path, PurePath
+from pathlib import PurePosixPath as PurePathClass
 from typing import TYPE_CHECKING, Literal
-
-if os.name == "nt":
-    import ntpath as pathmodule
-    from pathlib import PureWindowsPath as PurePathClass
-else:
-    import posixpath as pathmodule
-    from pathlib import PurePosixPath as PurePathClass
 
 import aiofiles
 import aiofiles.os
@@ -27,10 +22,6 @@ if TYPE_CHECKING:
 
 
 class LocalKaos:
-    """
-    A KAOS implementation that directly interacts with the local filesystem.
-    """
-
     name: str = "local"
 
     class Process:
@@ -171,5 +162,4 @@ class LocalKaos:
         return self.Process(process)
 
 
-local_kaos = LocalKaos()
-"""The default local KAOS instance."""
+local_kaos: LocalKaos = LocalKaos()

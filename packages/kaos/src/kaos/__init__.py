@@ -240,7 +240,6 @@ class StatResult:
 
 
 def get_current_kaos() -> Kaos:
-    """Get the current KAOS instance."""
     from kaos._current import current_kaos
 
     return current_kaos.get()

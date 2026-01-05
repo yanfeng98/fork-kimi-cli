@@ -8,7 +8,6 @@ cli = typer.Typer(help="Manage MCP server configurations.")
 
 
 def get_global_mcp_config_file() -> Path:
-    """Get the global MCP config file path."""
     from kimi_cli.share import get_share_dir
 
     return get_share_dir() / "mcp.json"

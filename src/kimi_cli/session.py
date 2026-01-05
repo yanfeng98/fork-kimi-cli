@@ -12,7 +12,7 @@ import aiofiles
 from kaos.path import KaosPath
 from kosong.message import Message
 
-from kimi_cli.metadata import WorkDirMeta, load_metadata, save_metadata
+from kimi_cli.metadata import Metadata, WorkDirMeta, load_metadata, save_metadata
 from kimi_cli.utils.logging import logger
 from kimi_cli.wire.message import TurnBegin
 from kimi_cli.wire.serde import WireMessageRecord
@@ -106,14 +106,14 @@ class Session:
         work_dir = work_dir.canonical()
         logger.debug("Creating new session for work directory: {work_dir}", work_dir=work_dir)
 
-        metadata = load_metadata()
-        work_dir_meta = metadata.get_work_dir_meta(work_dir)
+        metadata: Metadata = load_metadata()
+        work_dir_meta: WorkDirMeta | None = metadata.get_work_dir_meta(work_dir)
         if work_dir_meta is None:
             work_dir_meta = metadata.new_work_dir_meta(work_dir)
 
         if session_id is None:
             session_id = str(uuid.uuid4())
-        session_dir = work_dir_meta.sessions_dir / session_id
+        session_dir: Path = work_dir_meta.sessions_dir / session_id
         session_dir.mkdir(parents=True, exist_ok=True)
 
         if _context_file is None:
@@ -150,7 +150,6 @@ class Session:
 
     @staticmethod
     async def find(work_dir: KaosPath, session_id: str) -> Session | None:
-        """Find a session by work directory and session ID."""
         work_dir = work_dir.canonical()
         logger.debug(
             "Finding session for work directory: {work_dir}, session ID: {session_id}",
