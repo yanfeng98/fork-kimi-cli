@@ -27,36 +27,21 @@ class LLMProvider(BaseModel):
 
 
 class LLMModel(BaseModel):
-    """LLM model configuration."""
-
     provider: str
-    """Provider name"""
     model: str
-    """Model name"""
     max_context_size: int
-    """Maximum context size (unit: tokens)"""
     capabilities: set[ModelCapability] | None = None
-    """Model capabilities"""
 
 
 class LoopControl(BaseModel):
-    """Agent loop control configuration."""
-
     max_steps_per_run: int = 100
-    """Maximum number of steps in one run"""
     max_retries_per_step: int = 3
-    """Maximum number of retries in one step"""
 
 
 class MoonshotSearchConfig(BaseModel):
-    """Moonshot Search configuration."""
-
     base_url: str
-    """Base URL for Moonshot Search service."""
     api_key: SecretStr
-    """API key for Moonshot Search service."""
     custom_headers: dict[str, str] | None = None
-    """Custom headers to include in API requests."""
 
     @field_serializer("api_key", when_used="json")
     def dump_secret(self, v: SecretStr):
@@ -64,14 +49,9 @@ class MoonshotSearchConfig(BaseModel):
 
 
 class MoonshotFetchConfig(BaseModel):
-    """Moonshot Fetch configuration."""
-
     base_url: str
-    """Base URL for Moonshot Fetch service."""
     api_key: SecretStr
-    """API key for Moonshot Fetch service."""
     custom_headers: dict[str, str] | None = None
-    """Custom headers to include in API requests."""
 
     @field_serializer("api_key", when_used="json")
     def dump_secret(self, v: SecretStr):
@@ -79,32 +59,21 @@ class MoonshotFetchConfig(BaseModel):
 
 
 class Services(BaseModel):
-    """Services configuration."""
-
     moonshot_search: MoonshotSearchConfig | None = None
-    """Moonshot Search configuration."""
     moonshot_fetch: MoonshotFetchConfig | None = None
-    """Moonshot Fetch configuration."""
 
 
 class MCPClientConfig(BaseModel):
-    """MCP client configuration."""
-
     tool_call_timeout_ms: int = 60000
-    """Timeout for tool calls in milliseconds."""
 
 
 class MCPConfig(BaseModel):
-    """MCP configuration."""
-
     client: MCPClientConfig = Field(
         default_factory=MCPClientConfig, description="MCP client configuration"
     )
 
 
 class Config(BaseModel):
-    """Main configuration structure."""
-
     is_from_default_location: bool = Field(
         default=False,
         description="Whether the config was loaded from the default location",
@@ -130,12 +99,10 @@ class Config(BaseModel):
 
 
 def get_config_file() -> Path:
-    """Get the configuration file path."""
     return get_share_dir() / "config.toml"
 
 
 def get_default_config() -> Config:
-    """Get the default configuration."""
     return Config(
         default_model="",
         models={},
@@ -145,20 +112,7 @@ def get_default_config() -> Config:
 
 
 def load_config(config_file: Path | None = None) -> Config:
-    """
-    Load configuration from config file.
-    If the config file does not exist, create it with default configuration.
-
-    Args:
-        config_file (Path | None): Path to the configuration file. If None, use default path.
-
-    Returns:
-        Validated Config object.
-
-    Raises:
-        ConfigError: If the configuration file is invalid.
-    """
-    default_config_file = get_config_file()
+    default_config_file: Path = get_config_file()
     if config_file is None:
         config_file = default_config_file
     is_default_config_file = config_file.expanduser().resolve(
@@ -166,7 +120,6 @@ def load_config(config_file: Path | None = None) -> Config:
     ) == default_config_file.expanduser().resolve(strict=False)
     logger.debug("Loading config from file: {file}", file=config_file)
 
-    # If the user hasn't provided an explicit config path, migrate legacy JSON config once.
     if is_default_config_file and not config_file.exists():
         _migrate_json_config_to_toml()
 
@@ -222,13 +175,6 @@ def load_config_from_string(config_string: str) -> Config:
 
 
 def save_config(config: Config, config_file: Path | None = None):
-    """
-    Save configuration to config file.
-
-    Args:
-        config (Config): Config object to save.
-        config_file (Path | None): Path to the configuration file. If None, use default path.
-    """
     config_file = config_file or get_config_file()
     logger.debug("Saving config to file: {file}", file=config_file)
     config_file.parent.mkdir(parents=True, exist_ok=True)
@@ -241,8 +187,8 @@ def save_config(config: Config, config_file: Path | None = None):
 
 
 def _migrate_json_config_to_toml() -> None:
-    old_json_config_file = get_share_dir() / "config.json"
-    new_toml_config_file = get_share_dir() / "config.toml"
+    old_json_config_file: Path = get_share_dir() / "config.json"
+    new_toml_config_file: Path = get_share_dir() / "config.toml"
 
     if not old_json_config_file.exists():
         return
@@ -264,7 +210,6 @@ def _migrate_json_config_to_toml() -> None:
     except ValidationError as e:
         raise ConfigError(f"Invalid legacy configuration file: {e}") from e
 
-    # Write new TOML config, then keep a backup of the original JSON file.
     save_config(config, new_toml_config_file)
     backup_path = old_json_config_file.with_name("config.json.bak")
     old_json_config_file.replace(backup_path)
