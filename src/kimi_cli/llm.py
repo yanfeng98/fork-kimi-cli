@@ -42,11 +42,6 @@ class LLM:
 
 
 def augment_provider_with_env_vars(provider: LLMProvider, model: LLMModel) -> dict[str, str]:
-    """Override provider/model settings from environment variables.
-
-    Returns:
-        Mapping of environment variables that were applied.
-    """
     applied: dict[str, str] = {}
 
     match provider.type:

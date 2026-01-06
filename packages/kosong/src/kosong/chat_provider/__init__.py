@@ -98,8 +98,6 @@ type ThinkingEffort = Literal["off", "low", "medium", "high"]
 
 
 class ChatProviderError(Exception):
-    """The error raised by a chat provider."""
-
     def __init__(self, message: str):
         super().__init__(message)
 

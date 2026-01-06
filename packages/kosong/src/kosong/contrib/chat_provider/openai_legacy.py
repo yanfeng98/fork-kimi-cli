@@ -31,24 +31,9 @@ if TYPE_CHECKING:
 
 
 class OpenAILegacy:
-    """
-    A chat provider that uses the OpenAI Chat Completions API.
-
-    >>> chat_provider = OpenAILegacy(model="gpt-5", api_key="sk-1234567890")
-    >>> chat_provider.name
-    'openai'
-    >>> chat_provider.model_name
-    'gpt-5'
-    """
-
     name = "openai"
 
     class GenerationKwargs(TypedDict, extra_items=Any, total=False):
-        """
-        Generation kwargs for various kinds of OpenAI-compatible APIs.
-        `extra_items=Any` is used to support any extra args.
-        """
-
         max_tokens: int | None
         temperature: float | None
         top_p: float | None
@@ -69,12 +54,6 @@ class OpenAILegacy:
         tool_message_conversion: ToolMessageConversion | None = None,
         **client_kwargs: Any,
     ):
-        """
-        Initialize the OpenAILegacy chat provider.
-
-        To support OpenAI-compatible APIs that inject reasoning content in a extra field in
-        the message, such as `{"reasoning": ...}`, `reasoning_key` can be set to the key name.
-        """
         self.model = model
         self.stream = stream
         self.client = AsyncOpenAI(
@@ -82,7 +61,6 @@ class OpenAILegacy:
             base_url=base_url,
             **client_kwargs,
         )
-        """The underlying `AsyncOpenAI` client."""
         self._reasoning_effort: ReasoningEffort | Omit = omit
         self._reasoning_key = reasoning_key
         self._tool_message_conversion: ToolMessageConversion | None = tool_message_conversion

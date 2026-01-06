@@ -64,13 +64,10 @@ class KimiCLI:
         model: LLMModel | None = None
         provider: LLMProvider | None = None
 
-        # try to use config file
         if not model_name and config.default_model:
-            # no --model specified && default model is set in config
             model = config.models[config.default_model]
             provider = config.providers[model.provider]
         if model_name and model_name in config.models:
-            # --model specified && model is set in config
             model = config.models[model_name]
             provider = config.providers[model.provider]
 
@@ -78,10 +75,9 @@ class KimiCLI:
             model = LLMModel(provider="", model="", max_context_size=100_000)
             provider = LLMProvider(type="kimi", base_url="", api_key=SecretStr(""))
 
-        # try overwrite with environment variables
         assert provider is not None
         assert model is not None
-        env_overrides = augment_provider_with_env_vars(provider, model)
+        env_overrides: dict[str, str] = augment_provider_with_env_vars(provider, model)
 
         llm = create_llm(provider, model, session_id=session.id)
         if llm is not None:

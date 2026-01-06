@@ -34,27 +34,9 @@ if TYPE_CHECKING:
 
 
 class Kimi(ChatProvider):
-    """
-    A chat provider that uses the Kimi API.
-
-    >>> chat_provider = Kimi(model="kimi-k2-turbo-preview", api_key="sk-1234567890")
-    >>> chat_provider.name
-    'kimi'
-    >>> chat_provider.model_name
-    'kimi-k2-turbo-preview'
-    >>> chat_provider.with_generation_kwargs(temperature=0)._generation_kwargs
-    {'temperature': 0}
-    >>> chat_provider._generation_kwargs
-    {}
-    """
-
     name = "kimi"
 
     class GenerationKwargs(TypedDict, total=False):
-        """
-        See https://platform.moonshot.ai/docs/api/chat#request-body.
-        """
-
         max_tokens: int | None
         temperature: float | None
         top_p: float | None
@@ -84,15 +66,12 @@ class Kimi(ChatProvider):
             base_url = os.getenv("KIMI_BASE_URL", "https://api.moonshot.ai/v1")
 
         self.model: str = model
-        """The name of the model to use."""
         self.stream: bool = stream
-        """Whether to generate responses as a stream."""
         self.client: AsyncOpenAI = AsyncOpenAI(
             api_key=api_key,
             base_url=base_url,
             **client_kwargs,
         )
-        """The underlying `AsyncOpenAI` client."""
         self._generation_kwargs: Kimi.GenerationKwargs = {}
 
     @property
@@ -148,12 +127,6 @@ class Kimi(ChatProvider):
         return self.with_generation_kwargs(reasoning_effort=reasoning_effort)
 
     def with_generation_kwargs(self, **kwargs: Unpack[GenerationKwargs]) -> Self:
-        """
-        Copy the chat provider, updating the generation kwargs with the given values.
-
-        Returns:
-            Self: A new instance of the chat provider with updated generation kwargs.
-        """
         new_self = copy.copy(self)
         new_self._generation_kwargs = copy.deepcopy(self._generation_kwargs)
         new_self._generation_kwargs.update(kwargs)
