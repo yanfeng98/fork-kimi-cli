@@ -37,18 +37,11 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BuiltinSystemPromptArgs:
-    """Builtin system prompt arguments."""
-
     KIMI_NOW: str
-    """The current datetime."""
     KIMI_WORK_DIR: KaosPath
-    """The absolute path of current working directory."""
     KIMI_WORK_DIR_LS: str
-    """The directory listing of current working directory."""
-    KIMI_AGENTS_MD: str  # TODO: move to first message from system prompt
-    """The content of AGENTS.md."""
+    KIMI_AGENTS_MD: str
     KIMI_SKILLS: str
-    """Formatted information about available skills."""
 
 
 async def load_agents_md(work_dir: KaosPath) -> str | None:
@@ -94,10 +87,10 @@ class Runtime:
             skills_dir = get_skills_dir()
             if not skills_dir.is_dir() and (claude_skills_dir := get_claude_skills_dir()).is_dir():
                 skills_dir = claude_skills_dir
-        skills = discover_skills(skills_dir)
-        skills_by_name = index_skills(skills)
+        skills: list[Skill] = discover_skills(skills_dir)
+        skills_by_name: dict[str, Skill] = index_skills(skills)
         logger.info("Discovered {count} skill(s)", count=len(skills))
-        skills_formatted = "\n".join(
+        skills_formatted: str = "\n".join(
             (
                 f"- {skill.name}\n"
                 f"  - Path: {skill.skill_md_file}\n"
@@ -155,13 +148,10 @@ class Runtime:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Agent:
-    """The loaded agent."""
-
     name: str
     system_prompt: str
     toolset: Toolset
     runtime: Runtime
-    """Each agent has its own runtime, which should be derived from its main agent."""
 
 
 class LaborMarket:

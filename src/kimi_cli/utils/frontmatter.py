@@ -7,15 +7,6 @@ import yaml
 
 
 def read_frontmatter(path: Path) -> dict[str, Any] | None:
-    """
-    Read the YAML frontmatter at the start of a file.
-
-    Args:
-        path: Path to an existing file that may contain frontmatter.
-
-    Raises:
-        ValueError: If the frontmatter YAML is invalid.
-    """
     with path.open(encoding="utf-8", errors="replace") as handle:
         first_line = handle.readline()
         if not first_line or first_line.strip() != "---":

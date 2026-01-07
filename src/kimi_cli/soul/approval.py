@@ -29,8 +29,7 @@ class Approval:
         self._request_queue = Queue[Request]()
         self._requests: dict[str, tuple[Request, asyncio.Future[bool]]] = {}
         self._yolo = yolo
-        self._auto_approve_actions: set[str] = set()  # TODO: persist across sessions
-        """Set of action names that should automatically be approved."""
+        self._auto_approve_actions: set[str] = set()
 
     def set_yolo(self, yolo: bool) -> None:
         self._yolo = yolo
