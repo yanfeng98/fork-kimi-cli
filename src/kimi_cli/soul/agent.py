@@ -66,8 +66,6 @@ async def load_agents_md(work_dir: KaosPath) -> str | None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Runtime:
-    """Agent runtime."""
-
     config: Config
     llm: LLM | None
     session: Session
@@ -92,7 +90,6 @@ class Runtime:
             Environment.detect(),
         )
 
-        # Discover and format skills
         if skills_dir is None:
             skills_dir = get_skills_dir()
             if not skills_dir.is_dir() and (claude_skills_dir := get_claude_skills_dir()).is_dir():

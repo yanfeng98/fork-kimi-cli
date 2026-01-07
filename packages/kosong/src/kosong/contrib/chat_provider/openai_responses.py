@@ -76,21 +76,6 @@ def is_openai_model(model_name: str) -> bool:
 
 
 class OpenAIResponses:
-    """
-    A chat provider that uses the OpenAI Responses API.
-
-    Similar to `OpenAILegacy`, but uses `client.responses` under the hood.
-
-    This provider always enables reasoning when generating responses.
-    If you want to use a non-reasoning model, please use `OpenAILegacy` instead.
-
-    >>> chat_provider = OpenAIResponses(model="gpt-5-codex", api_key="sk-1234567890")
-    >>> chat_provider.name
-    'openai-responses'
-    >>> chat_provider.model_name
-    'gpt-5-codex'
-    """
-
     name = "openai-responses"
 
     class GenerationKwargs(TypedDict, total=False):

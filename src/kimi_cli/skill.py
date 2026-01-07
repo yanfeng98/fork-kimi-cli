@@ -65,15 +65,6 @@ class Skill(BaseModel):
 
 
 def discover_skills(skills_dir: Path) -> list[Skill]:
-    """
-    Discover all skills in the given directory.
-
-    Args:
-        skills_dir: Path to the directory containing skills.
-
-    Returns:
-        List of Skill objects, one for each valid skill found.
-    """
     if not skills_dir.is_dir():
         return []
 
