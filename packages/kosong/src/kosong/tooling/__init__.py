@@ -16,16 +16,9 @@ type ParametersType = dict[str, Any]
 
 
 class Tool(BaseModel):
-    """The definition of a tool that can be recognized by the model."""
-
     name: str
-    """The name of the tool."""
-
     description: str
-    """The description of the tool."""
-
     parameters: ParametersType
-    """The parameters of the tool, in JSON Schema format."""
 
     @model_validator(mode="after")
     def _validate_parameters(self) -> Self:
@@ -162,11 +155,6 @@ class ToolError(ToolReturnValue):
 class CallableTool(Tool, ABC):
     """
     The abstract base class of tools that can be called as callables.
-
-    The tool will be called with the arguments provided in the `ToolCall`.
-    If the arguments are given as a JSON array, it will be unpacked into positional arguments.
-    If the arguments are given as a JSON object, it will be unpacked into keyword arguments.
-    Otherwise, the arguments will be passed as a single argument.
     """
 
     @property
@@ -222,17 +210,11 @@ class _GenerateJsonSchemaNoTitles(GenerateJsonSchema):
 class CallableTool2[Params: BaseModel](ABC):
     """
     The abstract base class of tools that can be called as callables, with typed parameters.
-
-    The tool will be called with the arguments provided in the `ToolCall`.
-    The arguments must be a JSON object, and will be validated by Pydantic to the `Params` type.
     """
 
     name: str
-    """The name of the tool."""
     description: str
-    """The description of the tool."""
     params: type[Params]
-    """The Pydantic model type of the tool parameters."""
 
     def __init__(
         self,

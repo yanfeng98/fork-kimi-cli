@@ -2,8 +2,6 @@ from __future__ import annotations
 
 
 class KimiCLIException(Exception):
-    """Base exception class for Kimi CLI."""
-
     pass
 
 
@@ -14,8 +12,6 @@ class ConfigError(KimiCLIException, ValueError):
 
 
 class AgentSpecError(KimiCLIException, ValueError):
-    """Agent specification error."""
-
     pass
 
 

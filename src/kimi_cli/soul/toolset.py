@@ -125,13 +125,6 @@ class KimiToolset:
         return self._mcp_servers
 
     def load_tools(self, tool_paths: list[str], dependencies: dict[type[Any], Any]) -> None:
-        """
-        Load tools from paths like `kimi_cli.tools.shell:Shell`.
-
-        Raises:
-            InvalidToolError(KimiCLIException, ValueError): When any tool cannot be loaded.
-        """
-
         good_tools: list[str] = []
         bad_tools: list[str] = []
 
@@ -163,12 +156,9 @@ class KimiToolset:
             return None
         args: list[Any] = []
         if "__init__" in tool_cls.__dict__:
-            # the tool class overrides the `__init__` of base class
             for param in inspect.signature(tool_cls).parameters.values():
                 if param.kind == inspect.Parameter.KEYWORD_ONLY:
-                    # once we encounter a keyword-only parameter, we stop injecting dependencies
                     break
-                # all positional parameters should be dependencies to be injected
                 if param.annotation not in dependencies:
                     raise ValueError(f"Tool dependency not found: {param.annotation}")
                 args.append(dependencies[param.annotation])

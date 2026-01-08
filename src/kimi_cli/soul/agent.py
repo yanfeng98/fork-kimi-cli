@@ -118,15 +118,14 @@ class Runtime:
         )
 
     def copy_for_fixed_subagent(self) -> Runtime:
-        """Clone runtime for fixed subagent."""
         return Runtime(
             config=self.config,
             llm=self.llm,
             session=self.session,
             builtin_args=self.builtin_args,
-            denwa_renji=DenwaRenji(),  # subagent must have its own DenwaRenji
+            denwa_renji=DenwaRenji(),
             approval=self.approval,
-            labor_market=LaborMarket(),  # fixed subagent has its own LaborMarket
+            labor_market=LaborMarket(),
             environment=self.environment,
             skills=self.skills,
         )
@@ -166,7 +165,6 @@ class LaborMarket:
         return {**self.fixed_subagents, **self.dynamic_subagents}
 
     def add_fixed_subagent(self, name: str, agent: Agent, description: str):
-        """Add a fixed subagent."""
         self.fixed_subagents[name] = agent
         self.fixed_subagent_descs[name] = description
 
@@ -181,26 +179,15 @@ async def load_agent(
     *,
     mcp_configs: list[MCPConfig] | list[dict[str, Any]],
 ) -> Agent:
-    """
-    Load agent from specification file.
-
-    Raises:
-        FileNotFoundError: When the agent file is not found.
-        AgentSpecError(KimiCLIException, ValueError): When the agent specification is invalid.
-        InvalidToolError(KimiCLIException, ValueError): When any tool cannot be loaded.
-        MCPConfigError(KimiCLIException, ValueError): When any MCP configuration is invalid.
-        MCPRuntimeError(KimiCLIException, RuntimeError): When any MCP server cannot be connected.
-    """
     logger.info("Loading agent: {agent_file}", agent_file=agent_file)
     agent_spec = load_agent_spec(agent_file)
 
-    system_prompt = _load_system_prompt(
+    system_prompt: str = _load_system_prompt(
         agent_spec.system_prompt_path,
         agent_spec.system_prompt_args,
         runtime.builtin_args,
     )
 
-    # load subagents before loading tools because Task tool depends on LaborMarket on initialization
     for subagent_name, subagent_spec in agent_spec.subagents.items():
         logger.debug("Loading subagent: {subagent_name}", subagent_name=subagent_name)
         subagent = await load_agent(
