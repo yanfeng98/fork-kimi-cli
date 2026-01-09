@@ -164,17 +164,9 @@ class KimiToolset:
                 args.append(dependencies[param.annotation])
         return tool_cls(*args)
 
-    # TODO(rc): remove `in_background` parameter and always load in background
     async def load_mcp_tools(
         self, mcp_configs: list[MCPConfig], runtime: Runtime, in_background: bool = True
     ) -> None:
-        """
-        Load MCP tools from specified MCP configs.
-
-        Raises:
-            MCPRuntimeError(KimiCLIException, RuntimeError): When any MCP server cannot be
-                connected.
-        """
         import fastmcp
         from fastmcp.mcp_config import MCPConfig, RemoteMCPServer
 
@@ -279,7 +271,6 @@ class KimiToolset:
                 if isinstance(server_config, RemoteMCPServer) and server_config.auth == "oauth":
                     oauth_servers[server_name] = server_config.url
 
-                # Add mcp-session-id header for HTTP transports (skip OAuth servers)
                 if (
                     isinstance(server_config, RemoteMCPServer)
                     and server_config.auth != "oauth"
