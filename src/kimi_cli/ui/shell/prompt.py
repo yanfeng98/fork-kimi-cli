@@ -426,7 +426,6 @@ _REFRESH_INTERVAL = 1.0
 @dataclass(slots=True)
 class _ToastEntry:
     topic: str | None
-    """There can be only one toast of each non-None topic in the queue."""
     message: str
     duration: float
 
@@ -435,7 +434,6 @@ _toast_queues: dict[Literal["left", "right"], deque[_ToastEntry]] = {
     "left": deque(),
     "right": deque(),
 }
-"""The queue of toasts to show, including the one currently being shown (the first one)."""
 
 
 def toast(
@@ -449,7 +447,6 @@ def toast(
     duration = max(duration, _REFRESH_INTERVAL)
     entry = _ToastEntry(topic=topic, message=message, duration=duration)
     if topic is not None:
-        # Remove existing toasts with the same topic
         for existing in list(queue):
             if existing.topic == topic:
                 queue.remove(existing)

@@ -173,7 +173,6 @@ class KimiToolset:
         from kimi_cli.ui.shell.prompt import toast
 
         async def _check_oauth_tokens(server_url: str) -> bool:
-            """Check if OAuth tokens exist for the server."""
             try:
                 from fastmcp.client.auth.oauth import FileTokenStorage
 
@@ -249,7 +248,6 @@ class KimiToolset:
             failed_servers = {name: error for name, error in results if error is not None}
 
             for mcp_config in mcp_configs:
-                # Skip empty MCP configs (no servers defined)
                 if not mcp_config.mcpServers:
                     logger.debug("Skipping empty MCP config: {mcp_config}", mcp_config=mcp_config)
                     continue

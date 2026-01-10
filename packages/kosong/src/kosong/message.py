@@ -9,17 +9,14 @@ from kosong.utils.typing import JsonType
 
 class MergeableMixin:
     def merge_in_place(self, other: Any) -> bool:
-        """Merge the other part into the current part. Return True if the merge is successful."""
         return False
 
 
 class ContentPart(BaseModel, ABC, MergeableMixin):
-    """A part of a message content."""
-
     __content_part_registry: ClassVar[dict[str, type["ContentPart"]]] = {}
 
     type: str
-    ...  # to be added by subclasses
+    ...
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -38,15 +35,12 @@ class ContentPart(BaseModel, ABC, MergeableMixin):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        # If we're dealing with the base ContentPart class, use custom validation
         if cls.__name__ == "ContentPart":
 
             def validate_content_part(value: Any) -> Any:
-                # if it's already an instance of a ContentPart subclass, return it
                 if hasattr(value, "__class__") and issubclass(value.__class__, cls):
                     return value
 
-                # if it's a dict with a type field, dispatch to the appropriate subclass
                 if isinstance(value, dict) and "type" in value:
                     type_value: Any | None = cast(dict[str, Any], value).get("type")
                     if not isinstance(type_value, str):
@@ -58,7 +52,6 @@ class ContentPart(BaseModel, ABC, MergeableMixin):
 
             return core_schema.no_info_plain_validator_function(validate_content_part)
 
-        # for subclasses, use the default schema
         return handler(source_type)
 
 
@@ -163,32 +156,15 @@ class VideoURLPart(ContentPart):
 
 
 class ToolCall(BaseModel, MergeableMixin):
-    """
-    A tool call requested by the assistant.
-
-    >>> ToolCall(
-    ...     id="123",
-    ...     function=ToolCall.FunctionBody(name="function", arguments="{}"),
-    ... ).model_dump(exclude_none=True)
-    {'type': 'function', 'id': '123', 'function': {'name': 'function', 'arguments': '{}'}}
-    """
-
     class FunctionBody(BaseModel):
-        """Tool call function body."""
-
         name: str
-        """The name of the tool to be called."""
         arguments: str | None
-        """Arguments of the tool call in JSON string format."""
 
     type: Literal["function"] = "function"
 
     id: str
-    """The ID of the tool call."""
     function: FunctionBody
-    """The function body of the tool call."""
     extras: dict[str, JsonType] | None = None
-    """Extra information about the tool call."""
 
     @override
     def merge_in_place(self, other: Any) -> bool:
@@ -202,10 +178,7 @@ class ToolCall(BaseModel, MergeableMixin):
 
 
 class ToolCallPart(BaseModel, MergeableMixin):
-    """A part of the tool call."""
-
     arguments_part: str | None = None
-    """A part of the arguments of the tool call."""
 
     @override
     def merge_in_place(self, other: Any) -> bool:
@@ -219,38 +192,19 @@ class ToolCallPart(BaseModel, MergeableMixin):
 
 
 type Role = Literal[
-    # for OpenAI API, this should be converted to `developer`
-    # OpenAI & Kimi support system messages in the middle of the conversation.
-    # Anthropic only support system messages at the beginning https://docs.claude.com/en/api/messages#body-messages
-    # In this case, we map `system` message to a `user` message wrapped in `<system></system>` tags.
     "system",
     "user",
     "assistant",
     "tool",
 ]
-"""The role of a message sender."""
 
 
 class Message(BaseModel):
-    """A message in a conversation."""
-
     role: Role
-    """The role of the message sender."""
-
     name: str | None = None
-
     content: list[ContentPart]
-    """
-    The content of the message.
-    Empty list `[]` will be interpreted as no content.
-    """
-
     tool_calls: list[ToolCall] | None = None
-    """Tool calls requested by the assistant in this message."""
-
     tool_call_id: str | None = None
-    """The ID of the tool call if this message is a tool response."""
-
     partial: bool | None = None
 
     @field_serializer("content")

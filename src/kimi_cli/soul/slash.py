@@ -19,13 +19,6 @@ if TYPE_CHECKING:
     from kimi_cli.soul.kimisoul import KimiSoul
 
 type SoulSlashCmdFunc = Callable[[KimiSoul, str], None | Awaitable[None]]
-"""
-A function that runs as a KimiSoul-level slash command.
-
-Raises:
-    Any exception that can be raised by `Soul.run`.
-"""
-
 registry = SlashCommandRegistry[SoulSlashCmdFunc]()
 
 

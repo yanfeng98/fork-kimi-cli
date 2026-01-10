@@ -12,20 +12,15 @@ class SlashCommand[F: Callable[..., None | Awaitable[None]]]:
     aliases: list[str]
 
     def slash_name(self):
-        """/name (aliases)"""
         if self.aliases:
             return f"/{self.name} ({', '.join(self.aliases)})"
         return f"/{self.name}"
 
 
 class SlashCommandRegistry[F: Callable[..., None | Awaitable[None]]]:
-    """Registry for slash commands."""
-
     def __init__(self) -> None:
         self._commands: dict[str, SlashCommand[F]] = {}
-        """Primary name -> SlashCommand"""
         self._command_aliases: dict[str, SlashCommand[F]] = {}
-        """Primary name or alias -> SlashCommand"""
 
     @overload
     def command(self, func: F, /) -> F: ...
@@ -45,25 +40,10 @@ class SlashCommandRegistry[F: Callable[..., None | Awaitable[None]]]:
         name: str | None = None,
         aliases: Sequence[str] | None = None,
     ) -> F | Callable[[F], F]:
-        """
-        Decorator to register a slash command with optional custom name and aliases.
-
-        Usage examples:
-          @registry.command
-          def help(app: App, args: str): ...
-
-          @registry.command(name="run")
-          def start(app: App, args: str): ...
-
-          @registry.command(aliases=["h", "?", "assist"])
-          def help(app: App, args: str): ...
-        """
-
         def _register(f: F) -> F:
             primary = name or f.__name__
             alias_list = list(aliases) if aliases else []
 
-            # Create the primary command with aliases
             cmd = SlashCommand[F](
                 name=primary,
                 description=(f.__doc__ or "").strip(),
@@ -71,11 +51,9 @@ class SlashCommandRegistry[F: Callable[..., None | Awaitable[None]]]:
                 aliases=alias_list,
             )
 
-            # Register primary command
             self._commands[primary] = cmd
             self._command_aliases[primary] = cmd
 
-            # Register aliases pointing to the same command
             for alias in alias_list:
                 self._command_aliases[alias] = cmd
 
@@ -89,7 +67,6 @@ class SlashCommandRegistry[F: Callable[..., None | Awaitable[None]]]:
         return self._command_aliases.get(name)
 
     def list_commands(self) -> list[SlashCommand[F]]:
-        """Get all unique primary slash commands (without duplicating aliases)."""
         return list(self._commands.values())
 
 

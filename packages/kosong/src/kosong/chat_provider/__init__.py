@@ -94,7 +94,6 @@ class TokenUsage:
 
 
 type ThinkingEffort = Literal["off", "low", "medium", "high"]
-"""The effort level for thinking."""
 
 
 class ChatProviderError(Exception):

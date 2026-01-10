@@ -65,28 +65,19 @@ _registered_skill_commands: set[str] = set()
 
 
 class KimiSoul:
-    """The soul of Kimi CLI."""
-
     def __init__(
         self,
         agent: Agent,
         *,
         context: Context,
     ):
-        """
-        Initialize the soul.
-
-        Args:
-            agent (Agent): The agent to run.
-            context (Context): The context of the agent.
-        """
         self._agent = agent
         self._runtime = agent.runtime
         self._denwa_renji = agent.runtime.denwa_renji
         self._approval = agent.runtime.approval
         self._context = context
         self._loop_control = agent.runtime.config.loop_control
-        self._compaction = SimpleCompaction()  # TODO: maybe configurable and composable
+        self._compaction = SimpleCompaction()
         self._reserved_tokens = RESERVED_TOKENS
         if self._runtime.llm is not None:
             assert self._reserved_tokens <= self._runtime.llm.max_context_size
