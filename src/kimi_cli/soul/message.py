@@ -57,7 +57,6 @@ def _output_to_content_parts(
 def check_message(
     message: Message, model_capabilities: set[ModelCapability]
 ) -> set[ModelCapability]:
-    """Check the message content, return the missing model capabilities."""
     capabilities_needed = set[ModelCapability]()
     for part in message.content:
         if isinstance(part, ImageURLPart):

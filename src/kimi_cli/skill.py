@@ -27,7 +27,6 @@ def index_skills(skills: Iterable[Skill]) -> dict[str, Skill]:
 
 
 def read_skill_text(skill: Skill) -> str | None:
-    """Read the SKILL.md contents for a skill."""
     try:
         return skill.skill_md_file.read_text(encoding="utf-8").strip()
     except OSError as exc:

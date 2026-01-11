@@ -20,18 +20,12 @@ WireMessageQueue = BroadcastQueue[WireMessage]
 
 
 class Wire:
-    """
-    A spmc channel for communication between the soul and the UI during a soul run.
-    """
-
     def __init__(self, *, file_backend: Path | None = None):
-        self._raw_queue = WireMessageQueue()
-        self._merged_queue = WireMessageQueue()
-
-        self._soul_side = WireSoulSide(self._raw_queue, self._merged_queue)
+        self._raw_queue: WireMessageQueue = WireMessageQueue()
+        self._merged_queue: WireMessageQueue = WireMessageQueue()
+        self._soul_side: WireSoulSide = WireSoulSide(self._raw_queue, self._merged_queue)
 
         if file_backend is not None:
-            # record all complete Wire messages to the file backend
             self._recorder = _WireRecorder(file_backend, self._merged_queue.subscribe())
         else:
             self._recorder = None
@@ -60,26 +54,20 @@ class Wire:
 
 
 class WireSoulSide:
-    """
-    The soul side of a `Wire`.
-    """
-
     def __init__(self, raw_queue: WireMessageQueue, merged_queue: WireMessageQueue):
-        self._raw_queue = raw_queue
-        self._merged_queue = merged_queue
+        self._raw_queue: WireMessageQueue = raw_queue
+        self._merged_queue: WireMessageQueue = merged_queue
         self._merge_buffer: MergeableMixin | None = None
 
     def send(self, msg: WireMessage) -> None:
         if not isinstance(msg, ContentPart | ToolCallPart):
             logger.debug("Sending wire message: {msg}", msg=msg)
 
-        # send raw message
         try:
             self._raw_queue.publish_nowait(msg)
         except QueueShutDown:
             logger.info("Failed to send raw wire message, queue is shut down: {msg}", msg=msg)
 
-        # merge and send merged message
         match msg:
             case MergeableMixin():
                 if self._merge_buffer is None:

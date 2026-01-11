@@ -21,15 +21,11 @@ if TYPE_CHECKING:
 
 
 class LLMNotSet(Exception):
-    """Raised when the LLM is not set."""
-
     def __init__(self) -> None:
         super().__init__("LLM not set")
 
 
 class LLMNotSupported(Exception):
-    """Raised when the LLM does not have required capabilities."""
-
     def __init__(self, llm: LLM, capabilities: list[ModelCapability]):
         self.llm = llm
         self.capabilities = capabilities
@@ -41,10 +37,7 @@ class LLMNotSupported(Exception):
 
 
 class MaxStepsReached(Exception):
-    """Raised when the maximum number of steps is reached."""
-
     n_steps: int
-    """The number of steps that have been taken."""
 
     def __init__(self, n_steps: int):
         super().__init__(f"Max number of steps reached: {n_steps}")
@@ -178,19 +171,10 @@ _current_wire = ContextVar[Wire | None]("current_wire", default=None)
 
 
 def get_wire_or_none() -> Wire | None:
-    """
-    Get the current wire or None.
-    Expect to be not None when called from anywhere in the agent loop.
-    """
     return _current_wire.get()
 
 
 def wire_send(msg: WireMessage) -> None:
-    """
-    Send a wire message to the current wire.
-    Take this as `print` and `input` for souls.
-    Souls should always use this function to send wire messages.
-    """
     wire = get_wire_or_none()
     assert wire is not None, "Wire is expected to be set when soul is running"
     wire.soul_side.send(msg)

@@ -186,7 +186,7 @@ class KimiSoul:
         if missing_caps := check_message(user_message, self._runtime.llm.capabilities):
             raise LLMNotSupported(self._runtime.llm, list(missing_caps))
 
-        await self._checkpoint()  # this creates the checkpoint 0 on first run
+        await self._checkpoint()
         await self._context.append_message(user_message)
         logger.debug("Appended user message to context")
         await self._agent_loop()
@@ -210,7 +210,7 @@ class KimiSoul:
         self, skill: Skill
     ) -> Callable[[KimiSoul, str], None | Awaitable[None]]:
         async def _run_skill(soul: KimiSoul, args: str, *, _skill: Skill = skill) -> None:
-            skill_text = read_skill_text(_skill)
+            skill_text: str | None = read_skill_text(_skill)
             if skill_text is None:
                 wire_send(
                     TextPart(text=f'Failed to load skill "/{SKILL_COMMAND_PREFIX}{_skill.name}".')
@@ -225,7 +225,6 @@ class KimiSoul:
         return _run_skill
 
     async def _agent_loop(self):
-        """The main agent loop for one run."""
         assert self._runtime.llm is not None
 
         async def _pipe_approval_to_wire():

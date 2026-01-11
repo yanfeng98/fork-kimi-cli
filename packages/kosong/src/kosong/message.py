@@ -56,11 +56,6 @@ class ContentPart(BaseModel, ABC, MergeableMixin):
 
 
 class TextPart(ContentPart):
-    """
-    >>> TextPart(text="Hello, world!").model_dump()
-    {'type': 'text', 'text': 'Hello, world!'}
-    """
-
     type: str = "text"
     text: str
 

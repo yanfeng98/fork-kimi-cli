@@ -4,15 +4,10 @@ from kimi_cli.utils.aioqueue import Queue
 
 
 class BroadcastQueue[T]:
-    """
-    A broadcast queue that allows multiple subscribers to receive published items.
-    """
-
     def __init__(self) -> None:
         self._queues: set[Queue[T]] = set()
 
     def subscribe(self) -> Queue[T]:
-        """Create a new subscription queue."""
         queue: Queue[T] = Queue()
         self._queues.add(queue)
         return queue
@@ -26,7 +21,6 @@ class BroadcastQueue[T]:
         await asyncio.gather(*(queue.put(item) for queue in self._queues))
 
     def publish_nowait(self, item: T) -> None:
-        """Publish an item to all subscription queues without waiting."""
         for queue in self._queues:
             queue.put_nowait(item)
 

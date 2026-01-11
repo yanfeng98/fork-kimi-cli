@@ -28,10 +28,6 @@ def deserialize_wire_message(data: dict[str, JsonType] | Any) -> WireMessage:
 
 
 class WireMessageRecord(BaseModel):
-    """
-    The persisted record of a `WireMessage`.
-    """
-
     model_config = ConfigDict(extra="ignore")
 
     timestamp: float

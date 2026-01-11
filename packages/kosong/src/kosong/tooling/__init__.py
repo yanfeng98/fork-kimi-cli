@@ -30,7 +30,7 @@ class DisplayBlock(BaseModel, ABC):
     __display_block_registry: ClassVar[dict[str, type["DisplayBlock"]]] = {}
 
     type: str
-    ...  # to be added by subclasses
+    ...
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -49,15 +49,12 @@ class DisplayBlock(BaseModel, ABC):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        # If we're dealing with the base DisplayBlock class, use custom validation
         if cls.__name__ == "DisplayBlock":
 
             def validate_display_block(value: Any) -> Any:
-                # if it's already an instance of a DisplayBlock subclass, return it
                 if hasattr(value, "__class__") and issubclass(value.__class__, cls):
                     return value
 
-                # if it's a dict with a type field, dispatch to the appropriate subclass
                 if isinstance(value, dict) and "type" in value:
                     type_value: Any | None = cast(dict[str, Any], value).get("type")
                     if not isinstance(type_value, str):
@@ -74,46 +71,28 @@ class DisplayBlock(BaseModel, ABC):
 
             return core_schema.no_info_plain_validator_function(validate_display_block)
 
-        # for subclasses, use the default schema
         return handler(source_type)
 
 
 class UnknownDisplayBlock(DisplayBlock):
-    """Fallback display block for unknown types."""
-
     type: str = "unknown"
     data: JsonType
 
 
 class BriefDisplayBlock(DisplayBlock):
-    """A brief display block with plain string content."""
-
     type: str = "brief"
     text: str
 
 
 class ToolReturnValue(BaseModel):
-    """The return type of a callable tool."""
-
     is_error: bool
-    """Whether the tool call resulted in an error."""
-
-    # For model
     output: str | list[ContentPart]
-    """The output content returned by the tool."""
     message: str
-    """An explanatory message to be given to the model."""
-
-    # For user
     display: list[DisplayBlock]
-    """The content blocks to be displayed to the user."""
-
-    # For debugging/testing
     extras: dict[str, JsonType] | None = None
 
     @property
     def brief(self) -> str:
-        """Get the brief display block data, if any."""
         for block in self.display:
             if isinstance(block, BriefDisplayBlock):
                 return block.text
@@ -289,12 +268,8 @@ class CallableTool2[Params: BaseModel](ABC):
 
 
 class ToolResult(BaseModel):
-    """The result of a tool call."""
-
     tool_call_id: str
-    """The ID of the tool call."""
     return_value: ToolReturnValue
-    """The actual return value of the tool call."""
 
 
 ToolResultFuture = Future[ToolResult]
