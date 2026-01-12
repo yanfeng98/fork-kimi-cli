@@ -110,26 +110,6 @@ async def step(
     on_message_part: Callback[[StreamedMessagePart], None] | None = None,
     on_tool_result: Callable[[ToolResult], None] | None = None,
 ) -> "StepResult":
-    """
-    Run one agent "step". In one step, the function generates LLM response based on the given
-    context for exactly one time. All new message parts will be streamed to `on_message_part` in
-    real-time if provided. Tool calls will be handled by `toolset`. The generated message will be
-    returned in a `StepResult`. Depending on the toolset implementation, the tool calls may be
-    handled asynchronously and the results need to be fetched with `await result.tool_results()`.
-
-    The message history will NOT be modified in this function.
-
-    The token usage will be returned in the `StepResult` if available.
-
-    Raises:
-        APIConnectionError: If the API connection fails.
-        APITimeoutError: If the API request times out.
-        APIStatusError: If the API returns a status code of 4xx or 5xx.
-        APIEmptyResponseError: If the API returns an empty response.
-        ChatProviderError: If any other recognized chat provider error occurs.
-        asyncio.CancelledError: If the step is cancelled.
-    """
-
     tool_calls: list[ToolCall] = []
     tool_result_futures: dict[str, ToolResultFuture] = {}
 

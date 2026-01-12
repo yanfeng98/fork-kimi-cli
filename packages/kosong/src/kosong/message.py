@@ -68,15 +68,9 @@ class TextPart(ContentPart):
 
 
 class ThinkPart(ContentPart):
-    """
-    >>> ThinkPart(think="I think I need to think about this.").model_dump()
-    {'type': 'think', 'think': 'I think I need to think about this.', 'encrypted': None}
-    """
-
     type: str = "think"
     think: str
     encrypted: str | None = None
-    """Encrypted thinking content, or signature."""
 
     @override
     def merge_in_place(self, other: Any) -> bool:

@@ -118,8 +118,6 @@ class ToolOk(ToolReturnValue):
 
 
 class ToolError(ToolReturnValue):
-    """Subclass of `ToolReturnValue` representing a failed tool call."""
-
     def __init__(
         self, *, message: str, brief: str, output: str | ContentPart | list[ContentPart] = ""
     ):
@@ -278,10 +276,6 @@ type HandleResult = ToolResultFuture | ToolResult
 
 @runtime_checkable
 class Toolset(Protocol):
-    """
-    The interface of toolsets that can register tools and handle tool calls.
-    """
-
     @property
     def tools(self) -> list[Tool]:
         """The list of tool definitions registered in this toolset."""

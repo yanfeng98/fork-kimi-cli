@@ -78,7 +78,6 @@ class OpenAILegacy:
     ) -> "OpenAILegacyStreamedMessage":
         messages: list[ChatCompletionMessageParam] = []
         if system_prompt:
-            # `system` vs `developer`: see `message_to_openai` comments
             messages.append({"role": "system", "content": system_prompt})
         messages.extend(self._convert_message(message) for message in history)
 
@@ -130,11 +129,6 @@ class OpenAILegacy:
         return model_parameters
 
     def _convert_message(self, message: Message) -> ChatCompletionMessageParam:
-        """Convert a Kosong message to OpenAI message."""
-        # Note: for openai, `developer` role is more standard, but `system` is still accepted.
-        # And many openai-compatible models do not accept `developer` role.
-        # So we use `system` role here. OpenAIResponses will use `developer` role.
-        # See https://cdn.openai.com/spec/model-spec-2024-05-08.html#definitions
         message = message.model_copy(deep=True)
         reasoning_content: str = ""
         content: list[ContentPart] = []
@@ -143,8 +137,6 @@ class OpenAILegacy:
                 reasoning_content += part.think
             else:
                 content.append(part)
-        # if tool message and `tool_result_conversion` is `extract_text`, patch all text parts into
-        # one so that we can make use of the serialization process of `Message` to output string
         if message.role == "tool" and self._tool_message_conversion == "extract_text":
             message.content = [TextPart(text=message.extract_text(sep="\n"))]
         else:

@@ -47,8 +47,6 @@ class SimpleCompaction:
         if compact_message is None:
             return to_preserve
 
-        # Call kosong.step to get the compacted context
-        # TODO: set max completion tokens
         logger.debug("Compacting context...")
         result = await kosong.step(
             chat_provider=llm.chat_provider,
@@ -99,10 +97,8 @@ class SimpleCompaction:
         to_preserve = history[preserve_start_index:]
 
         if not to_compact:
-            # Let's hope this won't exceed the context size limit
             return self.PrepareResult(compact_message=None, to_preserve=to_preserve)
 
-        # Create input message for compaction
         compact_message = Message(role="user", content=[])
         for i, msg in enumerate(to_compact):
             compact_message.content.append(

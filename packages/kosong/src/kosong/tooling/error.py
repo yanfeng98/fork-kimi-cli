@@ -2,8 +2,6 @@ from kosong.tooling import ToolError
 
 
 class ToolNotFoundError(ToolError):
-    """The tool was not found."""
-
     def __init__(self, tool_name: str):
         super().__init__(
             message=f"Tool `{tool_name}` not found",

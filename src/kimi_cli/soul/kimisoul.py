@@ -253,7 +253,6 @@ class KimiSoul:
             approval_task = asyncio.create_task(_pipe_approval_to_wire())
             back_to_the_future: BackToTheFuture | None = None
             try:
-                # compact the context if needed
                 if (
                     self._context.token_count + self._reserved_tokens
                     >= self._runtime.llm.max_context_size
@@ -386,14 +385,6 @@ class KimiSoul:
         # token count of tool results are not available yet
 
     async def compact_context(self) -> None:
-        """
-        Compact the context.
-
-        Raises:
-            LLMNotSet: When the LLM is not set.
-            ChatProviderError: When the chat provider returns an error.
-        """
-
         @tenacity.retry(
             retry=retry_if_exception(self._is_retryable_error),
             before_sleep=partial(self._retry_log, "compaction"),
