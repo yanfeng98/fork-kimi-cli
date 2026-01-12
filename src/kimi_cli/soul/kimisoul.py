@@ -230,7 +230,6 @@ class KimiSoul:
         async def _pipe_approval_to_wire():
             while True:
                 request = await self._approval.fetch_request()
-                # Here we decouple the wire approval request and the soul approval request.
                 wire_request = ApprovalRequest(
                     id=request.id,
                     action=request.action,
@@ -240,10 +239,6 @@ class KimiSoul:
                     display=request.display,
                 )
                 wire_send(wire_request)
-                # We wait for the request to be resolved over the wire, which means that,
-                # for each soul, we will have only one approval request waiting on the wire
-                # at a time. However, be aware that subagents (which have their own souls) may
-                # also send approval requests to the root wire.
                 resp = await wire_request.wait()
                 self._approval.resolve_request(request.id, resp)
                 wire_send(ApprovalRequestResolved(request_id=request.id, response=resp))
@@ -256,10 +251,6 @@ class KimiSoul:
 
             wire_send(StepBegin(n=step_no))
             approval_task = asyncio.create_task(_pipe_approval_to_wire())
-            # FIXME: It's possible that a subagent's approval task steals approval request
-            # from the main agent. We must ensure that the Task tool will redirect them
-            # to the main wire. See `_SubWire` for more details. Later we need to figure
-            # out a better solution.
             back_to_the_future: BackToTheFuture | None = None
             try:
                 # compact the context if needed

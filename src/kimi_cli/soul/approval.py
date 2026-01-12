@@ -87,13 +87,9 @@ class Approval:
         return await approved_future
 
     async def fetch_request(self) -> Request:
-        """
-        Fetch an approval request from the queue. Intended to be called by the soul.
-        """
         while True:
             request = await self._request_queue.get()
             if request.action in self._auto_approve_actions:
-                # the action is not auto-approved when the request was created, but now it should be
                 logger.debug(
                     "Auto-approving previously requested action: {action}", action=request.action
                 )
@@ -103,16 +99,6 @@ class Approval:
             return request
 
     def resolve_request(self, request_id: str, response: Response) -> None:
-        """
-        Resolve an approval request with the given response. Intended to be called by the soul.
-
-        Args:
-            request_id (str): The ID of the request to resolve.
-            response (Response): The response to the request.
-
-        Raises:
-            KeyError: If there is no pending request with the given ID.
-        """
         request_tuple = self._requests.pop(request_id, None)
         if request_tuple is None:
             raise KeyError(f"No pending request with ID {request_id}")
