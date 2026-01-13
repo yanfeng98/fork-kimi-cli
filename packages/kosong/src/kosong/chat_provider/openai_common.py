@@ -45,8 +45,6 @@ def thinking_effort_to_reasoning_effort(effort: ThinkingEffort) -> ReasoningEffo
 
 
 def tool_to_openai(tool: Tool) -> ChatCompletionToolParam:
-    """Convert a single tool to OpenAI tool format."""
-    # simply `model_dump` because the `Tool` type is OpenAI-compatible
     return {
         "type": "function",
         "function": {

@@ -175,7 +175,7 @@ class OpenAILegacyStreamedMessage:
     @property
     def usage(self) -> TokenUsage | None:
         if self._usage:
-            cached = 0
+            cached: int = 0
             other_input = self._usage.prompt_tokens
             if (
                 self._usage.prompt_tokens_details
@@ -230,17 +230,14 @@ class OpenAILegacyStreamedMessage:
 
                 delta = chunk.choices[0].delta
 
-                # convert thinking content
                 reasoning_key = self._reasoning_key
                 if reasoning_key and (reasoning_content := getattr(delta, reasoning_key, None)):
                     assert isinstance(reasoning_content, str)
                     yield ThinkPart(think=reasoning_content)
 
-                # convert text content
                 if delta.content:
                     yield TextPart(text=delta.content)
 
-                # convert tool calls
                 for tool_call in delta.tool_calls or []:
                     if not tool_call.function:
                         continue
@@ -258,16 +255,21 @@ class OpenAILegacyStreamedMessage:
                             arguments_part=tool_call.function.arguments,
                         )
                     else:
-                        # skip empty tool calls
                         pass
         except (OpenAIError, httpx.HTTPError) as e:
             raise convert_error(e) from e
 
 
 if __name__ == "__main__":
+    import os
 
     async def _dev_main():
-        chat = OpenAILegacy(model="gpt-4o", stream=False)
+        chat = OpenAILegacy(
+            model="deepseek-v3-2-251201",
+            base_url=os.environ.get("OPENAI_BASE_URL"),
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            stream=False,
+        )
         system_prompt = "You are a helpful assistant."
         history = [Message(role="user", content="Hello, how are you?")]
         async for part in await chat.generate(system_prompt, [], history):

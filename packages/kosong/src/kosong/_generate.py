@@ -35,14 +35,12 @@ async def generate(
 
         if pending_part is None:
             pending_part = part
-        elif not pending_part.merge_in_place(part):  # try merge into the pending part
-            # unmergeable part must push the pending part to the buffer
+        elif not pending_part.merge_in_place(part):
             _message_append(message, pending_part)
             if isinstance(pending_part, ToolCall) and on_tool_call:
                 await callback(on_tool_call, pending_part)
             pending_part = part
 
-    # end of message
     if pending_part is not None:
         _message_append(message, pending_part)
         if isinstance(pending_part, ToolCall) and on_tool_call:
@@ -60,14 +58,9 @@ async def generate(
 
 @dataclass(frozen=True, slots=True)
 class GenerateResult:
-    """The result of a generation."""
-
     id: str | None
-    """The ID of the generated message."""
     message: Message
-    """The generated message."""
     usage: TokenUsage | None
-    """The token usage of the generated message."""
 
 
 def _message_append(message: Message, part: StreamedMessagePart) -> None:

@@ -144,7 +144,6 @@ async def step(
             on_tool_call=on_tool_call,
         )
     except (ChatProviderError, asyncio.CancelledError):
-        # cancel all the futures to avoid hanging tasks
         for future in tool_result_futures.values():
             future.remove_done_callback(future_done_callback)
             future.cancel()
@@ -163,19 +162,10 @@ async def step(
 @dataclass(frozen=True, slots=True)
 class StepResult:
     id: str | None
-    """The ID of the generated message."""
-
     message: Message
-    """The message generated in this step."""
-
     usage: TokenUsage | None
-    """The token usage in this step."""
-
     tool_calls: list[ToolCall]
-    """All the tool calls generated in this step."""
-
     _tool_result_futures: dict[str, ToolResultFuture]
-    """@private The futures of the results of the spawned tool calls."""
 
     async def tool_results(self) -> list[ToolResult]:
         """All the tool results returned by corresponding tool calls."""

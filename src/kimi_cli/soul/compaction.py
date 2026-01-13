@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, NamedTuple, Protocol, runtime_checkable
 
 import kosong
+from kosong import StepResult
 from kosong.message import ContentPart, Message, TextPart, ThinkPart
 from kosong.tooling.empty import EmptyToolset
 
@@ -48,7 +49,7 @@ class SimpleCompaction:
             return to_preserve
 
         logger.debug("Compacting context...")
-        result = await kosong.step(
+        result: StepResult = await kosong.step(
             chat_provider=llm.chat_provider,
             system_prompt="You are a helpful assistant that compacts conversation context.",
             toolset=EmptyToolset(),
@@ -66,7 +67,6 @@ class SimpleCompaction:
         ]
         compacted_msg = result.message
 
-        # drop thinking parts if any
         content.extend(part for part in compacted_msg.content if not isinstance(part, ThinkPart))
         compacted_messages: list[Message] = [Message(role="user", content=content)]
         compacted_messages.extend(to_preserve)

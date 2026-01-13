@@ -131,19 +131,8 @@ class Context:
                     self._history.append(message)
 
     async def clear(self):
-        """
-        Clear the context history.
-        This is almost equivalent to revert_to(0), but without relying on the assumption
-        that the first checkpoint exists.
-        File backend will be rotated.
-
-        Raises:
-            RuntimeError: When no available rotation path is found.
-        """
-
         logger.debug("Clearing context")
 
-        # rotate the context file
         rotated_file_path = await next_available_rotation(self._file_backend)
         if rotated_file_path is None:
             logger.error("No available rotation path found")

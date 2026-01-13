@@ -14,8 +14,6 @@ _ROTATION_FILE_MODE = 0o600
 
 
 async def _reserve_rotation_path(path: Path) -> bool:
-    """Atomically create an empty file as a reservation for *path*."""
-
     def _create() -> None:
         fd = os.open(str(path), _ROTATION_OPEN_FLAGS, _ROTATION_FILE_MODE)
         os.close(fd)
@@ -28,13 +26,6 @@ async def _reserve_rotation_path(path: Path) -> bool:
 
 
 async def next_available_rotation(path: Path) -> Path | None:
-    """Return a reserved rotation path for *path* or ``None`` if parent is missing.
-
-    The caller must overwrite/reuse the returned path immediately because this helper
-    commits an empty placeholder file to guarantee uniqueness. It is therefore suited
-    for rotating *files* (like history logs) but **not** directory creation.
-    """
-
     if not path.parent.exists():
         return None
 
