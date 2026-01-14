@@ -268,12 +268,10 @@ class KimiSoul:
                 back_to_the_future = e
                 finished = False
             except Exception:
-                # any other exception should interrupt the step
                 wire_send(StepInterrupted())
-                # break the agent loop
                 raise
             finally:
-                approval_task.cancel()  # stop piping approval requests to the wire
+                approval_task.cancel()
                 with suppress(asyncio.CancelledError):
                     try:
                         await approval_task
@@ -289,8 +287,6 @@ class KimiSoul:
                 await self._context.append_message(back_to_the_future.messages)
 
     async def _step(self) -> bool:
-        """Run an single step and return whether the run should be stopped."""
-        # already checked in `run`
         assert self._runtime.llm is not None
         chat_provider = self._runtime.llm.chat_provider
 
@@ -302,7 +298,6 @@ class KimiSoul:
             reraise=True,
         )
         async def _kosong_step_with_retry() -> StepResult:
-            # run an LLM step (may be interrupted)
             return await kosong.step(
                 chat_provider.with_thinking(self._thinking_effort),
                 self._agent.system_prompt,
@@ -316,16 +311,13 @@ class KimiSoul:
         logger.debug("Got step result: {result}", result=result)
         status_update = StatusUpdate(token_usage=result.usage, message_id=result.id)
         if result.usage is not None:
-            # mark the token count for the context before the step
             await self._context.update_token_count(result.usage.input)
             status_update.context_usage = self.status.context_usage
         wire_send(status_update)
 
-        # wait for all tool results (may be interrupted)
         results = await result.tool_results()
         logger.debug("Got tool results: {results}", results=results)
 
-        # shield the context manipulation from interruption
         await asyncio.shield(self._grow_context(result, results))
 
         rejected = any(isinstance(result.return_value, ToolRejectedError) for result in results)
@@ -333,13 +325,11 @@ class KimiSoul:
             _ = self._denwa_renji.fetch_pending_dmail()
             return True
 
-        # handle pending D-Mail
         if dmail := self._denwa_renji.fetch_pending_dmail():
             assert dmail.checkpoint_id >= 0, "DenwaRenji guarantees checkpoint_id >= 0"
             assert dmail.checkpoint_id < self._context.n_checkpoints, (
                 "DenwaRenji guarantees checkpoint_id < n_checkpoints"
             )
-            # raise to let the main loop take us back to the future
             raise BackToTheFuture(
                 dmail.checkpoint_id,
                 [
@@ -382,7 +372,6 @@ class KimiSoul:
             "Appending tool messages to context: {tool_messages}", tool_messages=tool_messages
         )
         await self._context.append_message(tool_messages)
-        # token count of tool results are not available yet
 
     async def compact_context(self) -> None:
         @tenacity.retry(
@@ -428,11 +417,6 @@ class KimiSoul:
 
 
 class BackToTheFuture(Exception):
-    """
-    Raise when we need to revert the context to a previous checkpoint.
-    The main agent loop should catch this exception and handle it.
-    """
-
     def __init__(self, checkpoint_id: int, messages: Sequence[Message]):
         self.checkpoint_id = checkpoint_id
         self.messages = messages

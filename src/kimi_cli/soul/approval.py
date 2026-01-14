@@ -41,21 +41,6 @@ class Approval:
         description: str,
         display: list[DisplayBlock] | None = None,
     ) -> bool:
-        """
-        Request approval for the given action. Intended to be called by tools.
-
-        Args:
-            sender (str): The name of the sender.
-            action (str): The action to request approval for.
-                This is used to identify the action for auto-approval.
-            description (str): The description of the action. This is used to display to the user.
-
-        Returns:
-            bool: True if the action is approved, False otherwise.
-
-        Raises:
-            RuntimeError: If the approval is requested from outside a tool call.
-        """
         tool_call = get_current_tool_call_or_none()
         if tool_call is None:
             raise RuntimeError("Approval must be requested from a tool call.")

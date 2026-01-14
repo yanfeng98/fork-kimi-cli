@@ -168,7 +168,6 @@ class StepResult:
     _tool_result_futures: dict[str, ToolResultFuture]
 
     async def tool_results(self) -> list[ToolResult]:
-        """All the tool results returned by corresponding tool calls."""
         if not self._tool_result_futures:
             return []
 
@@ -180,7 +179,6 @@ class StepResult:
                 results.append(result)
             return results
         finally:
-            # one exception should cancel all the futures to avoid hanging tasks
             for future in self._tool_result_futures.values():
                 future.cancel()
             await asyncio.gather(*self._tool_result_futures.values(), return_exceptions=True)

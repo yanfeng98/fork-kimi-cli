@@ -47,7 +47,6 @@ class MaxStepsReached(Exception):
 @dataclass(frozen=True, slots=True)
 class StatusSnapshot:
     context_usage: float
-    """The usage of the context, in percentage."""
 
 
 @runtime_checkable

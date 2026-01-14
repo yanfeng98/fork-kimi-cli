@@ -77,25 +77,11 @@ class Context:
             )
 
     async def revert_to(self, checkpoint_id: int):
-        """
-        Revert the context to the specified checkpoint.
-        After this, the specified checkpoint and all subsequent content will be
-        removed from the context. File backend will be rotated.
-
-        Args:
-            checkpoint_id (int): The ID of the checkpoint to revert to. 0 is the first checkpoint.
-
-        Raises:
-            ValueError: When the checkpoint does not exist.
-            RuntimeError: When no available rotation path is found.
-        """
-
         logger.debug("Reverting checkpoint, ID: {id}", id=checkpoint_id)
         if checkpoint_id >= self._next_checkpoint_id:
             logger.error("Checkpoint {checkpoint_id} does not exist", checkpoint_id=checkpoint_id)
             raise ValueError(f"Checkpoint {checkpoint_id} does not exist")
 
-        # rotate the context file
         rotated_file_path = await next_available_rotation(self._file_backend)
         if rotated_file_path is None:
             logger.error("No available rotation path found")
@@ -105,7 +91,6 @@ class Context:
             "Rotated context file: {rotated_file_path}", rotated_file_path=rotated_file_path
         )
 
-        # restore the context until the specified checkpoint
         self._history.clear()
         self._token_count = 0
         self._next_checkpoint_id = 0

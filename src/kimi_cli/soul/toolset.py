@@ -48,10 +48,6 @@ current_tool_call = ContextVar[ToolCall | None]("current_tool_call", default=Non
 
 
 def get_current_tool_call_or_none() -> ToolCall | None:
-    """
-    Get the current tool call or None.
-    Expect to be not None when called from a `__call__` method of a tool.
-    """
     return current_tool_call.get()
 
 
