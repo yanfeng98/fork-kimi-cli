@@ -68,9 +68,6 @@ async def list_directory(work_dir: KaosPath) -> str:
 
 
 def shorten_home(path: KaosPath) -> KaosPath:
-    """
-    Convert absolute path to use `~` for home directory.
-    """
     try:
         home = KaosPath.home()
         p = path.relative_to(home)

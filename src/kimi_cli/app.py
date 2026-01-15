@@ -125,7 +125,6 @@ class KimiCLI:
         original_cwd = KaosPath.cwd()
         await kaos.chdir(self._runtime.session.work_dir)
         try:
-            # to ignore possible warnings from dateparser
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             with contextlib.redirect_stderr(StreamToLogger()):
                 yield
@@ -182,7 +181,6 @@ class KimiCLI:
                 await soul_task
 
     async def run_shell(self, command: str | None = None) -> bool:
-        """Run the Kimi CLI instance with shell UI."""
         from kimi_cli.ui.shell import Shell, WelcomeInfoItem
 
         welcome_info = [

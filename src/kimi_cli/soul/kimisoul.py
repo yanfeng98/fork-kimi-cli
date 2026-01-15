@@ -138,13 +138,6 @@ class KimiSoul:
         return self._thinking_effort != "off"
 
     def set_thinking(self, enabled: bool) -> None:
-        """
-        Enable/disable thinking mode for the soul.
-
-        Raises:
-            LLMNotSet: When the LLM is not set.
-            LLMNotSupported: When the LLM does not support thinking mode.
-        """
         if self._runtime.llm is None:
             raise LLMNotSet()
         if enabled and "thinking" not in self._runtime.llm.capabilities:

@@ -76,13 +76,11 @@ class KaosPath:
         return normalized
 
     def relative_to(self, other: KaosPath) -> KaosPath:
-        """Return the relative path from `other` to this path."""
         relative_path = self._path.relative_to(other._path)
         return KaosPath(str(relative_path))
 
     @classmethod
     def home(cls) -> KaosPath:
-        """Return the home directory as a KaosPath."""
         return kaos.gethome()
 
     @classmethod

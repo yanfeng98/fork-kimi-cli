@@ -39,7 +39,6 @@ class Shell:
             **{cmd.name: cmd for cmd in soul.available_slash_commands},
             **{cmd.name: cmd for cmd in shell_slash_registry.list_commands()},
         }
-        """Shell-level slash commands + soul-level slash commands. Name to command mapping."""
 
     @property
     def available_slash_commands(self) -> dict[str, SlashCommand[Any]]:
@@ -48,11 +47,9 @@ class Shell:
 
     async def run(self, command: str | None = None) -> bool:
         if command is not None:
-            # run single command and exit
             logger.info("Running agent with command: {command}", command=command)
             return await self._run_soul_command(command)
 
-        # Start auto-update background task if not disabled
         if get_env_bool("KIMI_CLI_NO_AUTO_UPDATE"):
             logger.info("Auto-update disabled by KIMI_CLI_NO_AUTO_UPDATE environment variable")
         else:
@@ -188,12 +185,6 @@ class Shell:
         user_input: str | list[ContentPart],
         thinking: bool | None = None,
     ) -> bool:
-        """
-        Run the soul and handle any known exceptions.
-
-        Returns:
-            bool: Whether the run is successful.
-        """
         logger.info(
             "Running soul with user input: {user_input}, thinking {thinking}",
             user_input=user_input,
@@ -217,7 +208,7 @@ class Shell:
                 self.soul,
                 user_input,
                 lambda wire: visualize(
-                    wire.ui_side(merge=False),  # shell UI maintain its own merge buffer
+                    wire.ui_side(merge=False),
                     initial_status=StatusUpdate(context_usage=self.soul.status.context_usage),
                     cancel_event=cancel_event,
                 ),
@@ -229,7 +220,6 @@ class Shell:
             logger.exception("LLM not set:")
             console.print('[red]LLM not set, send "/setup" to configure[/red]')
         except LLMNotSupported as e:
-            # actually unsupported input/mode should already be blocked by prompt session
             logger.exception("LLM not supported:")
             console.print(f"[red]{e}[/red]")
         except ChatProviderError as e:
@@ -251,7 +241,7 @@ class Shell:
         except Exception as e:
             logger.exception("Unexpected error:")
             console.print(f"[red]Unexpected error: {e}[/red]")
-            raise  # re-raise unknown error
+            raise
         finally:
             remove_sigint()
         return False

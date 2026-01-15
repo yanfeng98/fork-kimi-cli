@@ -50,13 +50,6 @@ def kimi(
             is_eager=True,
         ),
     ] = False,
-    verbose: Annotated[
-        bool,
-        typer.Option(
-            "--verbose",
-            help="Print verbose information. Default: no.",
-        ),
-    ] = False,
     debug: Annotated[
         bool,
         typer.Option(
