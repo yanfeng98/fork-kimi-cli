@@ -109,19 +109,6 @@ async def run_soul(
     cancel_event: asyncio.Event,
     wire_file: Path | None = None,
 ) -> None:
-    """
-    Run the soul with the given user input, connecting it to the UI loop with a `Wire`.
-
-    `cancel_event` is a outside handle that can be used to cancel the run. When the
-    event is set, the run will be gracefully stopped and a `RunCancelled` will be raised.
-
-    Raises:
-        LLMNotSet: When the LLM is not set.
-        LLMNotSupported: When the LLM does not have required capabilities.
-        ChatProviderError: When the LLM provider returns an error.
-        MaxStepsReached: When the maximum number of steps is reached.
-        RunCancelled: When the run is cancelled by the cancel event.
-    """
     wire = Wire(file_backend=wire_file)
     wire_token = _current_wire.set(wire)
 
@@ -146,14 +133,13 @@ async def run_soul(
             except asyncio.CancelledError:
                 raise RunCancelled from None
         else:
-            assert soul_task.done()  # either stop event is set or the run task is done
+            assert soul_task.done()
             cancel_event_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await cancel_event_task
-            soul_task.result()  # this will raise if any exception was raised in the run task
+            soul_task.result()
     finally:
         logger.debug("Shutting down the UI loop")
-        # shutting down the wire should break the UI loop
         wire.shutdown()
         try:
             await asyncio.wait_for(ui_task, timeout=0.5)

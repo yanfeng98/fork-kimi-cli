@@ -18,12 +18,10 @@ from rich.text import Text
 from kimi_cli.soul import LLMNotSet, LLMNotSupported, MaxStepsReached, RunCancelled, Soul, run_soul
 from kimi_cli.soul.kimisoul import KimiSoul
 from kimi_cli.ui.shell.console import console
-from kimi_cli.ui.shell.prompt import CustomPromptSession, PromptMode, toast
+from kimi_cli.ui.shell.prompt import CustomPromptSession, PromptMode
 from kimi_cli.ui.shell.replay import replay_recent_history
 from kimi_cli.ui.shell.slash import registry as shell_slash_registry
-from kimi_cli.ui.shell.update import LATEST_VERSION_FILE, UpdateResult, do_update, semver_tuple
 from kimi_cli.ui.shell.visualize import visualize
-from kimi_cli.utils.envvar import get_env_bool
 from kimi_cli.utils.signals import install_sigint_handler
 from kimi_cli.utils.slashcmd import SlashCommand, SlashCommandCall, parse_slash_command_call
 from kimi_cli.utils.term import ensure_new_line, ensure_tty_sane
@@ -49,11 +47,6 @@ class Shell:
         if command is not None:
             logger.info("Running agent with command: {command}", command=command)
             return await self._run_soul_command(command)
-
-        if get_env_bool("KIMI_CLI_NO_AUTO_UPDATE"):
-            logger.info("Auto-update disabled by KIMI_CLI_NO_AUTO_UPDATE environment variable")
-        else:
-            self._start_background_task(self._auto_update())
 
         _print_welcome_info(self.soul.name or "Kimi CLI", self._welcome_info)
 
@@ -246,20 +239,6 @@ class Shell:
             remove_sigint()
         return False
 
-    async def _auto_update(self) -> None:
-        toast("checking for updates...", topic="update", duration=2.0)
-        result = await do_update(print=False, check_only=True)
-        if result == UpdateResult.UPDATE_AVAILABLE:
-            while True:
-                toast(
-                    "new version found, run `uv tool upgrade kimi-cli` to upgrade",
-                    topic="update",
-                    duration=30.0,
-                )
-                await asyncio.sleep(60.0)
-        elif result == UpdateResult.UPDATED:
-            toast("auto updated, restart to use the new version", topic="update", duration=5.0)
-
     def _start_background_task(self, coro: Coroutine[Any, Any, Any]) -> asyncio.Task[Any]:
         task = asyncio.create_task(coro)
         self._background_tasks.add(task)
@@ -315,18 +294,6 @@ def _print_welcome_info(name: str, info_items: list[WelcomeInfoItem]) -> None:
         rows.append(Text(""))  # empty line
     for item in info_items:
         rows.append(Text(f"{item.name}: {item.value}", style=item.level.value))
-
-    if LATEST_VERSION_FILE.exists():
-        from kimi_cli.constant import VERSION as current_version
-
-        latest_version = LATEST_VERSION_FILE.read_text(encoding="utf-8").strip()
-        if semver_tuple(latest_version) > semver_tuple(current_version):
-            rows.append(
-                Text.from_markup(
-                    f"\n[yellow]New version available: {latest_version}. "
-                    "Please run `uv tool upgrade kimi-cli` to upgrade.[/yellow]"
-                )
-            )
 
     console.print(
         Panel(

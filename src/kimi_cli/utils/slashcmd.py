@@ -78,13 +78,6 @@ class SlashCommandCall:
 
 
 def parse_slash_command_call(user_input: str) -> SlashCommandCall | None:
-    """
-    Parse a slash command call from user input.
-
-    Returns:
-        SlashCommandCall if a slash command is found, else None. The `args` field contains
-        the raw argument string after the command name.
-    """
     user_input = user_input.strip()
     if not user_input or not user_input.startswith("/"):
         return None

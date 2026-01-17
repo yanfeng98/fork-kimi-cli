@@ -46,14 +46,6 @@ async def visualize(
     initial_status: StatusUpdate,
     cancel_event: asyncio.Event | None = None,
 ):
-    """
-    A loop to consume agent events and visualize the agent behavior.
-
-    Args:
-        wire: Communication channel with the agent
-        initial_status: Initial status snapshot
-        cancel_event: Event that can be set (e.g., by ESC key) to cancel the run
-    """
     view = _LiveView(initial_status, cancel_event)
     await view.visualize_loop(wire)
 

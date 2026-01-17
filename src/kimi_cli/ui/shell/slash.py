@@ -294,6 +294,5 @@ async def mcp(app: Shell, args: str):
 from . import (  # noqa: E402
     debug,  # noqa: F401 # type: ignore[reportUnusedImport]
     setup,  # noqa: F401 # type: ignore[reportUnusedImport]
-    update,  # noqa: F401 # type: ignore[reportUnusedImport]
     usage,  # noqa: F401 # type: ignore[reportUnusedImport]
 )

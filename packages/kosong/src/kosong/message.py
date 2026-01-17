@@ -233,5 +233,4 @@ class Message(BaseModel):
         )
 
     def extract_text(self, sep: str = "") -> str:
-        """Extract and concatenate all text parts in the message content."""
         return sep.join(part.text for part in self.content if isinstance(part, TextPart))

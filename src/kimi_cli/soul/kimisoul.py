@@ -161,7 +161,6 @@ class KimiSoul:
         if command_call := parse_slash_command_call(text_input):
             command = soul_slash_registry.find_command(command_call.name)
             if command is None:
-                # this should not happen actually, the shell should have filtered it out
                 wire_send(TextPart(text=f'Unknown slash command "/{command_call.name}".'))
                 return
 

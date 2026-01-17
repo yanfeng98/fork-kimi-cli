@@ -35,12 +35,6 @@ class Wire:
         return self._soul_side
 
     def ui_side(self, *, merge: bool) -> WireUISide:
-        """
-        Create a UI side of the `Wire`.
-
-        Args:
-            merge: Whether to merge `Wire` messages as much as possible.
-        """
         if merge:
             return WireUISide(self._merged_queue.subscribe())
         else:
@@ -95,10 +89,6 @@ class WireSoulSide:
 
 
 class WireUISide:
-    """
-    The UI side of a `Wire`.
-    """
-
     def __init__(self, queue: Queue[WireMessage]):
         self._queue = queue
 
