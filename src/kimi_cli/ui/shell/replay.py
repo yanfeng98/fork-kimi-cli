@@ -45,9 +45,6 @@ async def replay_recent_history(
     *,
     wire_file: Path | None = None,
 ) -> None:
-    """
-    Replay the most recent user-initiated turns from the provided message history or wire file.
-    """
     turns = await _build_replay_turns_from_wire(wire_file)
     if not turns:
         start_idx = _find_replay_start(history)
@@ -65,7 +62,7 @@ async def replay_recent_history(
         )
         for event in turn.events:
             wire.soul_side.send(event)
-            await asyncio.sleep(0)  # yield to UI loop
+            await asyncio.sleep(0)
         wire.shutdown()
         with contextlib.suppress(QueueShutDown):
             await ui_task
@@ -121,7 +118,6 @@ async def _build_replay_turns_from_wire(wire_file: Path | None) -> list[_ReplayT
 
 
 def _is_user_message(message: Message) -> bool:
-    # FIXME: should consider non-text tool call results which are sent as user messages
     if message.role != "user":
         return False
     return not message.extract_text().startswith("<system>CHECKPOINT")
@@ -131,7 +127,6 @@ def _find_replay_start(history: Sequence[Message]) -> int | None:
     indices = [idx for idx, message in enumerate(history) if _is_user_message(message)]
     if not indices:
         return None
-    # only replay last MAX_REPLAY_TURNS messages
     return indices[max(0, len(indices) - MAX_REPLAY_TURNS)]
 
 
@@ -140,7 +135,6 @@ def _build_replay_turns_from_history(history: Sequence[Message]) -> list[_Replay
     current_turn: _ReplayTurn | None = None
     for message in history:
         if _is_user_message(message):
-            # start a new turn
             if current_turn is not None:
                 turns.append(current_turn)
             current_turn = _ReplayTurn(user_message=message, events=[])

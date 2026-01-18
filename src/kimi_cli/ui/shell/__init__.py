@@ -48,7 +48,7 @@ class Shell:
             logger.info("Running agent with command: {command}", command=command)
             return await self._run_soul_command(command)
 
-        _print_welcome_info(self.soul.name or "Kimi CLI", self._welcome_info)
+        _print_welcome_info(self._welcome_info)
 
         if isinstance(self.soul, KimiSoul):
             await replay_recent_history(
@@ -277,11 +277,10 @@ class WelcomeInfoItem:
     level: Level = Level.INFO
 
 
-def _print_welcome_info(name: str, info_items: list[WelcomeInfoItem]) -> None:
+def _print_welcome_info(info_items: list[WelcomeInfoItem]) -> None:
     head = Text.from_markup("Welcome to 2026, happy new year!")
     help_text = Text.from_markup("[grey50]Send /help for help information.[/grey50]")
 
-    # Use Table for precise width control
     logo = Text.from_markup(_LOGO)
     table = Table(show_header=False, show_edge=False, box=None, padding=(0, 1), expand=False)
     table.add_column(justify="left")
@@ -291,7 +290,7 @@ def _print_welcome_info(name: str, info_items: list[WelcomeInfoItem]) -> None:
     rows: list[RenderableType] = [table]
 
     if info_items:
-        rows.append(Text(""))  # empty line
+        rows.append(Text(""))
     for item in info_items:
         rows.append(Text(f"{item.name}: {item.value}", style=item.level.value))
 

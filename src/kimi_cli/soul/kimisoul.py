@@ -134,7 +134,6 @@ class KimiSoul:
 
     @property
     def thinking(self) -> bool:
-        """Whether thinking mode is enabled."""
         return self._thinking_effort != "off"
 
     def set_thinking(self, enabled: bool) -> None:

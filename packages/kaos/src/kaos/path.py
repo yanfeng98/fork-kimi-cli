@@ -17,10 +17,6 @@ class KaosPath:
         return cls(str(path))
 
     def unsafe_to_local_path(self) -> Path:
-        """
-        Convert the `KaosPath` to a local `Path`.
-        Only use this if you are sure that `LocalKaos` is being used.
-        """
         return Path(str(self._path))
 
     def __lt__(self, other: KaosPath) -> bool:

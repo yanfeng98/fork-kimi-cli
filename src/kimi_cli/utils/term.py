@@ -8,8 +8,6 @@ import time
 
 
 def ensure_new_line() -> None:
-    """Ensure the next prompt starts at column 0 regardless of prior command output."""
-
     if not sys.stdout.isatty() or not sys.stdin.isatty():
         return
 
@@ -26,7 +24,6 @@ def ensure_new_line() -> None:
 
 
 def ensure_tty_sane() -> None:
-    """Restore basic tty settings so Ctrl-C works after raw-mode operations."""
     if sys.platform == "win32" or not sys.stdin.isatty():
         return
 

@@ -85,20 +85,9 @@ class ThinkPart(ContentPart):
 
 
 class ImageURLPart(ContentPart):
-    """
-    >>> ImageURLPart(
-    ...     image_url=ImageURLPart.ImageURL(url="https://example.com/image.png")
-    ... ).model_dump()
-    {'type': 'image_url', 'image_url': {'url': 'https://example.com/image.png', 'id': None}}
-    """
-
     class ImageURL(BaseModel):
-        """Image URL payload."""
-
         url: str
-        """The URL of the image, can be data URI scheme like `data:image/png;base64,...`."""
         id: str | None = None
-        """The ID of the image, to allow LLMs to distinguish different images."""
 
     type: str = "image_url"
     image_url: ImageURL

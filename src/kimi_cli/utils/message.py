@@ -4,8 +4,6 @@ from kosong.message import Message, TextPart
 
 
 def message_stringify(message: Message) -> str:
-    """Get a string representation of a message."""
-    # TODO: this should be merged into `kosong.message.Message.extract_text`
     parts: list[str] = []
     for part in message.content:
         if isinstance(part, TextPart):

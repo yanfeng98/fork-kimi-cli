@@ -57,13 +57,6 @@ PROMPT_SYMBOL_THINKING = "💫"
 
 
 class SlashCommandCompleter(Completer):
-    """
-    A completer that:
-    - Shows one line per slash command in the form: "/name (alias1, alias2)"
-    - Matches by primary name or any alias while inserting the canonical "/name"
-    - Only activates when the current token starts with '/'
-    """
-
     def __init__(self, available_commands: Sequence[SlashCommand[Any]]) -> None:
         super().__init__()
         self._available_commands = available_commands
@@ -103,8 +96,6 @@ class SlashCommandCompleter(Completer):
 
 
 class LocalFileMentionCompleter(Completer):
-    """Offer fuzzy `@` path completion by indexing workspace files."""
-
     _FRAGMENT_PATTERN = re.compile(r"[^\s@]+")
     _TRIGGER_GUARDS = frozenset((".", "-", "_", "`", "'", '"', ":", "@", "#", "~"))
     _IGNORED_NAME_GROUPS: dict[str, tuple[str, ...]] = {
@@ -253,7 +244,6 @@ class LocalFileMentionCompleter(Completer):
             for current_root, dirs, files in os.walk(self._root):
                 relative_root = Path(current_root).relative_to(self._root)
 
-                # Prevent descending into ignored directories.
                 dirs[:] = sorted(d for d in dirs if not self._is_ignored(d))
 
                 if relative_root.parts and any(
@@ -505,7 +495,6 @@ class CustomPromptSession:
         self._mode: PromptMode = PromptMode.AGENT
         self._thinking = initial_thinking
         self._attachment_parts: dict[str, ContentPart] = {}
-        """Mapping from attachment id to ContentPart."""
 
         history_entries = _load_history_entries(self._history_file)
         history = InMemoryHistory()
@@ -513,29 +502,23 @@ class CustomPromptSession:
             history.append_string(entry.content)
 
         if history_entries:
-            # for consecutive deduplication
             self._last_history_content = history_entries[-1].content
 
-        # Build completers
         self._agent_mode_completer = merge_completers(
             [
                 SlashCommandCompleter(available_slash_commands),
-                # TODO(kaos): we need an async KaosFileMentionCompleter
                 LocalFileMentionCompleter(KaosPath.cwd().unsafe_to_local_path()),
             ],
             deduplicate=True,
         )
 
-        # Build key bindings
         _kb = KeyBindings()
         shortcut_hints: list[str] = []
 
         @_kb.add("enter", filter=has_completions)
         def _(event: KeyPressEvent) -> None:
-            """Accept the first completion when Enter is pressed and completions are shown."""
             buff = event.current_buffer
             if buff.complete_state and buff.complete_state.completions:
-                # Get the current completion, or use the first one if none is selected
                 completion = buff.complete_state.current_completion
                 if not completion:
                     completion = buff.complete_state.completions[0]
@@ -544,9 +527,7 @@ class CustomPromptSession:
         @_kb.add("c-x", eager=True)
         def _(event: KeyPressEvent) -> None:
             self._mode = self._mode.toggle()
-            # Apply mode-specific settings
             self._apply_mode(event)
-            # Redraw UI
             event.app.invalidate()
 
         shortcut_hints.append("ctrl-x: switch mode")
@@ -581,7 +562,6 @@ class CustomPromptSession:
 
         @_kb.add("tab", filter=~has_completions & is_agent_mode, eager=True)
         def _(event: KeyPressEvent) -> None:
-            """Toggle thinking mode when Tab is pressed and no completions are shown."""
             if "thinking" not in self._model_capabilities:
                 console.print(
                     "[yellow]Thinking mode is not supported by the selected LLM model[/yellow]"
@@ -594,7 +574,6 @@ class CustomPromptSession:
         self._shortcut_hints = shortcut_hints
         self._session = PromptSession[str](
             message=self._render_message,
-            # prompt_continuation=FormattedText([("fg:#4d4d4d", "... ")]),
             completer=self._agent_mode_completer,
             complete_while_typing=Condition(lambda: self._mode == PromptMode.AGENT),
             key_bindings=_kb,
@@ -603,8 +582,6 @@ class CustomPromptSession:
             bottom_toolbar=self._render_bottom_toolbar,
         )
 
-        # Allow completion to be triggered when the text is changed,
-        # such as when backspace is used to delete text.
         @self._session.default_buffer.on_text_changed.add_handler
         def _(buffer: Buffer) -> None:
             if buffer.complete_while_typing():
@@ -619,14 +596,12 @@ class CustomPromptSession:
         return FormattedText([("bold", f"{getpass.getuser()}@{KaosPath.cwd().name}{symbol} ")])
 
     def _apply_mode(self, event: KeyPressEvent | None = None) -> None:
-        # Apply mode to the active buffer (not the PromptSession itself)
         try:
             buff = event.current_buffer if event is not None else self._session.default_buffer
         except Exception:
             buff = None
 
         if self._mode == PromptMode.SHELL:
-            # Cancel any active completion menu
             with contextlib.suppress(Exception):
                 if buff is not None:
                     buff.cancel_completion()
@@ -669,8 +644,6 @@ class CustomPromptSession:
         self._attachment_parts.clear()
 
     def _try_paste_image(self, event: KeyPressEvent) -> bool:
-        """Try to paste an image from the clipboard. Return True if successful."""
-        # Try get image from clipboard
         image = ImageGrab.grabclipboard()
         if image is None:
             return False
